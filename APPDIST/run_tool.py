@@ -13,7 +13,7 @@ def create_results(filename, model_size, sex, weight, height):
     # run step 1
     result_folder = "resultsdir/" + sexlabel + filename + "/d=" + model_size 
     args_runsinglewebinput = "../tmp/uploaded_mesh/" + filename + ".ply " + model_size + " resultsdir " +  str(sex) + " " + str(weight) + " " + str(height)
-    print("python runsinglewebinput.py " + args_runsinglewebinput)
+    print("\n------------------\npython runsinglewebinput.py " + args_runsinglewebinput + "\n------------------\n")
     os.system("python runsinglewebinput.py " + args_runsinglewebinput)
     print("running pcamatch")
     result_ply = open(result_folder + "/result.ply")
@@ -22,9 +22,8 @@ def create_results(filename, model_size, sex, weight, height):
     while not content:
         time.sleep(2.5)
         i += 2.5
-        if i % 10 == 0:
-            print("Waited ... " + str(i) + " seconds")
         content = result_ply.read()
+    print("Waited ... " + str(i) + " seconds")
     print("result.ply is ready\n")
     result_ply.close()
     #run step 2

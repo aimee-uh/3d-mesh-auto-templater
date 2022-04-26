@@ -6,3 +6,6 @@ APPDIST/inputmeshes
 APPDIST/batchscripts_DONOTUSEFORWEB
 APPDIST/resultsdir
 .gitattributes
+**/__pycache__
+*.pyc
+migrations

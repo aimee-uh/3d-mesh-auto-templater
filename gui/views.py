@@ -7,9 +7,11 @@ from django.template import loader
 from APPDIST.run_tool import create_results
 import csv
 
+
 # home page
 @xframe_options_exempt
 def index(request):
+    analysis_started = False
     form = UploadFileForm()
     # when the form is submitted
     if request.method == 'POST':
@@ -29,11 +31,21 @@ def index(request):
                 if ply_is_ascii(file_path):
                     print("ply is ascii")
                     request.session['model_id'] = inputs.id
-                    request.session['height'] = inputs.height
-                    request.session['weight'] = inputs.weight
-                    request.session['age'] = inputs.age
-                    request.session['sex'] = inputs.sex
-                    request.session['filename'] = file.name.removesuffix('.ply')
+                    height = inputs.height
+                    weight = inputs.weight
+                    age = inputs.age
+                    sex = inputs.sex
+                    filename = inputs.uploaded_file.name.removeprefix('uploaded_mesh/').removesuffix('.ply')
+                    # this is where we'll run the algorithm
+                    model_size = '391'
+                    if inputs.sex == 1:
+                        model_size = '457'
+                    if not analysis_started:
+                        analysis_started = True
+                        result_folder = create_results(filename, model_size, sex, weight, height)
+                    request.session['result_folder'] = result_folder
+                    request.session['model_size'] = model_size
+                    # redirect
                     print("try to redirect")
                     return HttpResponseRedirect('/results/')
                 else:
@@ -55,16 +67,8 @@ def index(request):
 def results(request):
     print("successfully redirected")
     # get values from the session
-    height = request.session['height']
-    weight = request.session['weight']
-    age = request.session['age']
-    sex = request.session['sex']
-    filename = request.session['filename']
-    # this is where we'll run the algorithm
-    model_size = '391'
-    if sex == 1:
-        model_size = '457'
-    result_folder = create_results(filename, model_size, sex, weight, height)
+    result_folder = request.session['result_folder']
+    model_size = request.session['model_size']
     # get the results
     results_csv = open("APPDIST/" + result_folder + "/gangerrefinedprojectpredict_" + model_size + ".csv")
     read_csv = csv.reader(results_csv)

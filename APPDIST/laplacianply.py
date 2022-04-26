@@ -2,7 +2,6 @@ import numpy as np
 import sys
 #same as in projectPCA.py
 def readTemplatePlyFile(infile):
-    print("readTemplatePlyFile")
     headerEnd = False
     vertNum = 0
     headerstring = ""
@@ -26,17 +25,14 @@ def readTemplatePlyFile(infile):
         vertices[i*3] = point[0]
         vertices[i*3 + 1] = point[1]
         vertices[i*3 + 2] = point[2]
-        print(point)
     
     face = infile.readline()
     while len(face) > 0:
         facelist += face
         face = infile.readline()
-        print(face)
     return vertices, headerstring, facelist
     
 def writePCAtoPly(plyfile, points, header, facelist):
-    print("writePCAtoPly")
     plyfile.write(header)
     #normals = surfacenormals.recomputeSurfaceNormals(points, facelist)
     for i in range(0, int(len(points) / 3.0)):
@@ -45,7 +41,6 @@ def writePCAtoPly(plyfile, points, header, facelist):
     plyfile.write(facelist)
     
 def neighborlist(facelist, size):
-    print("neighborlist")
     neighbors = [ [] for _ in range(size) ]
     facelist = facelist.split('\n')
     for i in range(0, len(facelist)):
@@ -103,12 +98,10 @@ def hclaplacianavg(vertices, neighbors, o):
 
 #assimilates all the above functions to do hclaplacian on a file and save it as new mesh
 def doHCLaplacianAndSave(fname, iters=1):
-    print("doHCLaplacianAndSave")
     v, h, f = readTemplatePlyFile(open(fname, 'r'))
     o = np.copy(v)
     neighbors = neighborlist(f, int(len(v) / 3))
     for i in range(iters):
-        print(i)
         v = hclaplacianavg(v, neighbors, o)
         v = v.flatten()
         #print len(v)

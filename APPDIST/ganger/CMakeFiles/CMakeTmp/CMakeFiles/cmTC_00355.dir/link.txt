@@ -1,0 +1,1 @@
+/usr/lib64/ccache/cc      -v CMakeFiles/cmTC_00355.dir/CMakeCCompilerABI.c.o  -o cmTC_00355 -rdynamic  

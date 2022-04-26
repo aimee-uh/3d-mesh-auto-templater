@@ -77,9 +77,7 @@ projectshapeply = targetfolder + '/gangerRefinedProjectedShape_' + str(numpcomps
             
 #by default ganger outputs binary. Convert here
 pargs = " ".join(['./ply2asc <', './' + gangerply,  '> ./' + gangerply[:-4] + '_ascii.ply'])
-print("\n\n")
 print(pargs)
-print("\n\n")
 pr = subprocess.Popen(pargs, shell=True)
 pr.wait()
 plyascii = gangerply[:-4] + "_ascii.ply"
