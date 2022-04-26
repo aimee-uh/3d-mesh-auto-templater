@@ -31,9 +31,9 @@ Main Files
 
 **models.py** - defines DataInput model
 
-### SHAPEUPADULTS3D_APPDIST
+### APPDIST
 
-Algorithm that will be called in views
+**run_tool.py** - called in views.py to run shell commands for the algorithm
 
 Editing and Running
 ---------
