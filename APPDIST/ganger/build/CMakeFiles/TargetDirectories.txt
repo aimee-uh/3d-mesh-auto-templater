@@ -1,0 +1,3 @@
+/homes/grail/iytian/iytian/ganger/build/CMakeFiles/rebuild_cache.dir
+/homes/grail/iytian/iytian/ganger/build/CMakeFiles/edit_cache.dir
+/homes/grail/iytian/iytian/ganger/build/CMakeFiles/Deformation.dir
