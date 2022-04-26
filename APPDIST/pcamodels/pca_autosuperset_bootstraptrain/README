@@ -1,0 +1,5 @@
+This set is composed of the AUTO FITTED GANGER REFINED meshes of the bootstrap AND training sets of all three devices
+
+Source meshes are the results of pcatrainaug, the meshes produced by fitting the bootstrap and training sets with the manually markered ganger set of the bootstrap
+
+There are no manually markered meshes in this set
