@@ -1,36 +1,3 @@
-#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
-
-#IncludeRegexScan: ^.*$
-
-#IncludeRegexComplain: ^$
-
-#IncludeRegexTransform: 
-
-/homes/grail/iytian/iytian/ganger/lbfgsb.c
-math.h
--
-string.h
--
-
-/homes/grail/iytian/iytian/ganger/ply.h
-stdio.h
--
-stddef.h
--
-sys/types.h
--
-
-/homes/grail/iytian/iytian/ganger/plyfile.c
-stdio.h
--
-stdlib.h
--
-math.h
--
-string.h
--
-fcntl.h
--
-ply.h
-/homes/grail/iytian/iytian/ganger/ply.h
-
+version https://git-lfs.github.com/spec/v1
+oid sha256:ef12b1f52fa294d449f97eb855e6d511517445c14458d60f3f05fecbcc36af95
+size 471

@@ -5,3 +5,4 @@ tmp
 APPDIST/inputmeshes
 APPDIST/batchscripts_DONOTUSEFORWEB
 APPDIST/resultsdir
+.gitattributes

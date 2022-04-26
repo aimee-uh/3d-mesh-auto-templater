@@ -1,19 +1,3 @@
-file(REMOVE_RECURSE
-  "CMakeFiles/Deformation.dir/lbfgsb.o"
-  "CMakeFiles/Deformation.dir/deformation_noVTK.o"
-  "CMakeFiles/Deformation.dir/trimesh.o"
-  "CMakeFiles/Deformation.dir/trimesh_util.o"
-  "CMakeFiles/Deformation.dir/surfaceDef.o"
-  "CMakeFiles/Deformation.dir/solver.o"
-  "CMakeFiles/Deformation.dir/quatnorm.o"
-  "CMakeFiles/Deformation.dir/markers.o"
-  "CMakeFiles/Deformation.dir/ba.o"
-  "CMakeFiles/Deformation.dir/plyfile.o"
-  "Deformation.pdb"
-  "Deformation"
-)
-
-# Per-language clean rules from dependency scanning.
-foreach(lang C CXX)
-  include(CMakeFiles/Deformation.dir/cmake_clean_${lang}.cmake OPTIONAL)
-endforeach()
+version https://git-lfs.github.com/spec/v1
+oid sha256:cb469a6648eb1a0c7f34d8a18efae2dad750900a070664faec740e98f9777ed0
+size 659

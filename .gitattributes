@@ -1,1 +1,11 @@
 APPDIST/pcamodels/pca_kidsadultsq4merged/superset/pcafiles/f_pca_superset filter=lfs diff=lfs merge=lfs -text
+APPDIST/pcamodels/pca_kidsadultsq4merged/superset/pcafiles filter=lfs diff=lfs merge=lfs -text
+APPDIST/pcamodels/pca_kidsadultsq4merged/superset/pcafiles/* filter=lfs diff=lfs merge=lfs -text
+APPDIST/pcamodels/**/* filter=lfs diff=lfs merge=lfs -text
+APPDIST/ganger/build/* filter=lfs diff=lfs merge=lfs -text
+APPDIST/ganger/build/**/* filter=lfs diff=lfs merge=lfs -text
+APPDIST/ganger/CMakeFiles/* filter=lfs diff=lfs merge=lfs -text
+APPDIST/ganger/CMakeFiles/Deformation.dir/* filter=lfs diff=lfs merge=lfs -text
+APPDIST/ganger/CMakeFiles/3.3.2/* filter=lfs diff=lfs merge=lfs -text
+APPDIST/ganger/CMakeFiles/3.3.2/**/* filter=lfs diff=lfs merge=lfs -text
+APPDIST/ganger/CMakeFiles/3.3.2/*/* filter=lfs diff=lfs merge=lfs -text

@@ -1,5 +1,3 @@
-This set is composed of the AUTO FITTED GANGER REFINED meshes of the bootstrap AND training sets of all three devices
-
-Source meshes are the results of pcatrainaug, the meshes produced by fitting the bootstrap and training sets with the manually markered ganger set of the bootstrap
-
-There are no manually markered meshes in this set
+version https://git-lfs.github.com/spec/v1
+oid sha256:050eb0c8a1d94cb843d99ee38c8c68c7c8848f99a738a846f6f2a0e71db934e0
+size 339
