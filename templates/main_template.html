@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Shape Up! Adults | 3D Mesh Auto Templater</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  </head>
+  <body>
+    {{ content }}
+    {% block content %}{% endblock %}
+  </body>
+</html>

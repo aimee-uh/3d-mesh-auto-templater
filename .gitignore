@@ -1,0 +1,7 @@
+staticfiles
+db.sqlite3
+tmp
+.vscode
+APPDIST/inputmeshes
+APPDIST/batchscripts_DONOTUSEFORWEB
+APPDIST/resultsdir
