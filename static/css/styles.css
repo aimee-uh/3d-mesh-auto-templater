@@ -1,4 +1,4 @@
-#form-container {
+.container {
     width: 33vh;
     outline: 1px solid #c4c4c4;
     margin-left: auto;
@@ -8,14 +8,14 @@
     min-width: 350px;
 }
 
-#form-container form {
+.container form {
     text-align: center;
     display: flex;
     flex-direction: column;
 }
 
-#form-container form input,
-#form-container form select {
+.container form input,
+.container form select {
     margin-bottom: 40px;
 }
 

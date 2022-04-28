@@ -27,17 +27,18 @@ SECRET_KEY = 'django-insecure-c672cl5lh*tvvh7muf9z9be#+sax9pei9ruf-^3zf3#sw$eiut
 # DEBUG = True
 DEBUG = True
 
-ALLOWED_HOSTS = ['.herokuapp.com','localhost','shepherdresearchlab.org']
+
+ALLOWED_HOSTS = ['localhost','shepherdresearchlab.org','.ngrok.io']
 
 # CORS settings that allow additional trusted origins (for iFrame functionality)
-CORS_ALLOWED_ORIGINS = ['https://bodycomp-from-3do.herokuapp.com','https://shapeup.shepherdresearchlab.org']
+CORS_ALLOWED_ORIGINS = ['https://4f18-128-171-232-10.ngrok.io','https://shapeup.shepherdresearchlab.org']
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https://\w+\.shepherdresearch\.org$",
-    r"^https://\w+\.herokuapp\.com$",
+    r"^https://\w+\.ngrok\.io$",
 ]
 CSRF_TRUSTED_ORIGINS = [
-    "https://shapeup.shepherdresearchlab.org/",
-    "https://bodycomp-from-3do.herokuapp.com/"
+    "https://shapeup.shepherdresearchlab.org",
+    "https://4f18-128-171-232-10.ngrok.io",
 ]
 
 # Allow site to be embedded into trusted origins
@@ -93,6 +94,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'gui.wsgi.application'
+ASGI_APPLICATION = "gui.asgi.application"
 
 
 # Database
