@@ -127,6 +127,7 @@ def index(request):
 
 
 # results after form submit
+@xframe_options_exempt
 def results(request):
     # get values from the session
     height = request.session['height']
