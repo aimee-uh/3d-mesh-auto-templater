@@ -144,8 +144,8 @@ def results(request):
 
     print("\n\n------\nget results")
     # get the results
-    result_csv_path = 'APPDIST' + result_folder + '/gangerrefinedprojectpredict_' + size + '.csv'
-    ply = open('APPDIST' + result_folder + '/gangerrefinedprojectpredict_' + size + '.csv', encoding='cp1252')
+    result_csv_path = 'APPDIST/' + result_folder + '/gangerrefinedprojectpredict_' + size + '.csv'
+    ply = open('APPDIST/' + result_folder + '/gangerrefinedprojectpredict_' + size + '.csv', encoding='cp1252')
     final_result = DataOutput(model_size=size, result_ply=File(ply))
     print('predict csv is ready\n')
     results_csv = open(result_csv_path)

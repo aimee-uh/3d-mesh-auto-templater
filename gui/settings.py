@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-c672cl5lh*tvvh7muf9z9be#+sax9pei9ruf-^3zf3#sw$eiut
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = True
-DEBUG = True
+DEBUG = False
 
 
 ALLOWED_HOSTS = ['localhost','shepherdresearchlab.org','.ngrok.io']
