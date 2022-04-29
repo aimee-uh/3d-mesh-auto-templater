@@ -144,6 +144,8 @@ def results(request):
     if not request.session['result_folder']:
         result_folder = load_data(height, weight, sex, filename, size)
         request.session['result_folder'] = result_folder
+    else:
+        print("result_folder already exists")
 
     print("\n\n------\nget results")
     # get the results
