@@ -5,15 +5,17 @@
 
 
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import DataInput
+from numpy import True_
+from .models import DataInput, DataOutput
 from django.forms import ModelForm
 from django.forms.utils import ErrorList
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.template import loader
+from django.core.files import File
 from APPDIST.run_tool import step1, step2
 import time
 import csv
-import os.path
+import os
 import asyncio
 
 ## HELPER FUNCTIONS ##
@@ -64,8 +66,6 @@ def ply_is_ascii(file_path):
         except:
             return False
     return format == 'format ascii 1.0\n'
-
-
 
 # takes DataInput model to generate the form
 class UploadFileForm(ModelForm):
@@ -134,41 +134,47 @@ def results(request):
     age = request.session['age']
     sex = request.session['sex']
     filename = request.session['filename']
-    model_size = '391'
+    size = '391'
     if sex == 1:
-        model_size = '457'
-    
+        size = '457'
+
     # helper for running algorithm
-    result_folder = load_data(height, weight, sex, filename, model_size)
+    result_folder = load_data(height, weight, sex, filename, size)
 
     print("\n\n------\nget results")
     # get the results
-     # check every 2.5 seconds whether result_hcsmooth12.ply_deform.ply has been created
-    print("waiting to make sure predict csv exists")
-    result_csv_path = '../APPDIST/' + result_folder + '/gangerrefinedprojectpredict_' + model_size + '.csv'
-    i = 0
-    while not os.path.isfile(result_csv_path):
-        time.sleep(1)
-        i += 1
-    print('Waited for ... ' + str(i) + ' seconds')
+    result_csv_path = 'APPDIST' + result_folder + '/gangerrefinedprojectpredict_' + size + '.csv'
+    ply = open('APPDIST' + result_folder + '/gangerrefinedprojectpredict_' + size + '.csv', encoding='cp1252')
+    final_result = DataOutput(model_size=size, result_ply=File(ply))
     print('predict csv is ready\n')
-    print("open prediction results csv")
     results_csv = open(result_csv_path)
-    print("read data")
+    final_result.predicted_csv = File(results_csv)
     read_csv = csv.reader(results_csv)
     output = '<h1>Body Composition Predictions:</h1>'
-    print("read each line in the csv")
     for row in read_csv:
-        try:
-            row[1]
-            output += '<p><b>' + row[0].replace('_', ' ') + ':</b>'
-            output += row[1] + '</p>'
-            print(output)
-        except:
-            continue
+        print(row[0])
+        if row[0] == "DXA_WEIGHT": final_result.DXA_WEIGHT = row[1]
+        elif row[0] == "DXA_HEIGHT": final_result.DXA_HEIGHT = row[1]
+        elif row[0] == "DXA_WBTOT_FAT": final_result.DXA_WBTOT_FAT = row[1]
+        elif row[0] == "DXA_WBTOT_LEAN": final_result.DXA_WBTOT_LEAN = row[1]
+        elif row[0] == "DXA_VFAT_MASS": final_result.DXA_VFAT_MASS = row[1]
+        elif row[0] == "DXA_ARM_LEAN": final_result.DXA_ARM_LEAN = row[1]
+        elif row[0] == "DXA_LEG_LEAN": final_result.DXA_LEG_LEAN = row[1]
+        elif row[0] == "DXA_WBTOT_PFAT": final_result.DXA_WBTOT_PFAT = row[1]
+        elif row[0] == "DXA_TRUNK_FAT": final_result.DXA_TRUNK_FAT = row[1]
+        elif row[0] == "DXA_TRUNK_LEAN": final_result.DXA_TRUNK_LEAN = row[1]
+        elif row[0] == "DXA_ARM_FAT": final_result.DXA_ARM_FAT = row[1]
+        elif row[0] == "DXA_LEG_FAT": final_result.DXA_LEG_FAT = row[1]
+        else: continue
+        output += '<p><b>' + row[0].replace('_', ' ') + ':</b>'
+        output += row[1] + '</p>'
+    final_result.predicted_csv = File(results_csv)
+    final_result.save()
+    output += '<a href=' + str(final_result.result_ply) + '></a>'
+    output += '<a href=' + str(final_result.predicted_csv) + '></a>'
     results_csv.close()
+    ply.close()
     # end the session
-    print("End session")
     end_session(request)
     # placeholder output
     print("render page")

@@ -12,7 +12,7 @@ class DataInput(models.Model):
     uploaded_file = models.FileField("3DO file (.PLY)", upload_to="uploaded_mesh")
 
 class DataOutput(models.Model):
-    models_size = models.PositiveIntegerField()
+    model_size = models.PositiveIntegerField()
     DXA_WEIGHT = models.FloatField()
     DXA_HEIGHT = models.FloatField()
     DXA_WBTOT_FAT = models.FloatField()
