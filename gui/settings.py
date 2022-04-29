@@ -31,14 +31,14 @@ DEBUG = False
 ALLOWED_HOSTS = ['localhost','shepherdresearchlab.org','.ngrok.io']
 
 # CORS settings that allow additional trusted origins (for iFrame functionality)
-CORS_ALLOWED_ORIGINS = ['https://4f18-128-171-232-10.ngrok.io','https://shapeup.shepherdresearchlab.org']
+CORS_ALLOWED_ORIGINS = ['https://2e6a-128-171-232-10.ngrok.io','https://shapeup.shepherdresearchlab.org']
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https://\w+\.shepherdresearch\.org$",
     r"^https://\w+\.ngrok\.io$",
 ]
 CSRF_TRUSTED_ORIGINS = [
     "https://shapeup.shepherdresearchlab.org",
-    "https://4f18-128-171-232-10.ngrok.io",
+    "https://2e6a-128-171-232-10.ngrok.io",
 ]
 
 # Allow site to be embedded into trusted origins
@@ -103,7 +103,7 @@ ASGI_APPLICATION = "gui.asgi.application"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': str(BASE_DIR / 'db.sqlite3'),
     }
 }
 

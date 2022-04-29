@@ -109,6 +109,7 @@ def index(request):
                     request.session['age'] = inputs.age
                     request.session['sex'] = inputs.sex
                     request.session['filename'] = file.name.removesuffix('.ply')
+                    request.session['result_folder'] = ''
                     # redirect to the results page
                     return HttpResponseRedirect('results')
                 else:
@@ -140,7 +141,9 @@ def results(request):
         size = '457'
 
     # helper for running algorithm
-    result_folder = load_data(height, weight, sex, filename, size)
+    if not request.session['result_folder']:
+        result_folder = load_data(height, weight, sex, filename, size)
+        request.session['result_folder'] = result_folder
 
     print("\n\n------\nget results")
     # get the results
