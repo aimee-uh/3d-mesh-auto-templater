@@ -29,10 +29,13 @@ def load_data(height, weight, sex, filename, model_size):
     result_folder = 'APPDIST/resultsdir/' + sexlabel + filename + '/d=' + model_size
 
     print("\n\n------\nrunning step 1")
-    step1(filename, model_size, sex, weight, height)
+    try:
+        result_ply = open(result_folder + '/result.ply')
+    except:
+        step1(filename, model_size, sex, weight, height)
+        result_ply = open(result_folder + '/result.ply')
     print('waiting for pcamatch to create result.ply')
     # check every 2.5 seconds whether result.ply has been written
-    result_ply = open(result_folder + '/result.ply')
     content = result_ply.read()
     i = 0
     while not content:
@@ -155,39 +158,42 @@ def results(request):
 
     print("\n\n------\nget results")
     # get the results
-    result_csv_path = result_folder + '/gangerrefinedprojectpredict_' + size + '.csv'
-    ply = open(result_folder + '/result_hcsmooth12.ply_deform.ply', errors='ignore')
-    final_result = DataOutput(input_data=request.session['model_id'], model_size=size, result_ply=File(ply))
-    print('predict csv is ready\n')
-    results_csv = open(result_csv_path)
-    final_result.predicted_csv = File(results_csv)
-    read_csv = csv.reader(results_csv)
-    output = '<h1>Body Composition Predictions:</h1>'
-    for row in read_csv:
-        print(row[0])
-        if row[0] == "DXA_WEIGHT": final_result.DXA_WEIGHT = row[1]
-        elif row[0] == "DXA_HEIGHT": final_result.DXA_HEIGHT = row[1]
-        elif row[0] == "DXA_WBTOT_FAT": final_result.DXA_WBTOT_FAT = row[1]
-        elif row[0] == "DXA_WBTOT_LEAN": final_result.DXA_WBTOT_LEAN = row[1]
-        elif row[0] == "DXA_VFAT_MASS": final_result.DXA_VFAT_MASS = row[1]
-        elif row[0] == "DXA_ARM_LEAN": final_result.DXA_ARM_LEAN = row[1]
-        elif row[0] == "DXA_LEG_LEAN": final_result.DXA_LEG_LEAN = row[1]
-        elif row[0] == "DXA_WBTOT_PFAT": final_result.DXA_WBTOT_PFAT = row[1]
-        elif row[0] == "DXA_TRUNK_FAT": final_result.DXA_TRUNK_FAT = row[1]
-        elif row[0] == "DXA_TRUNK_LEAN": final_result.DXA_TRUNK_LEAN = row[1]
-        elif row[0] == "DXA_ARM_FAT": final_result.DXA_ARM_FAT = row[1]
-        elif row[0] == "DXA_LEG_FAT": final_result.DXA_LEG_FAT = row[1]
-        else: continue
-        output += '<p><b>' + row[0].replace('_', ' ') + ':</b>'
-        output += row[1] + '</p>'
-    final_result.predicted_csv = File(results_csv)
-    final_result.save()
-    ply_tmp_name = final_result.result_ply.name.split('/')[-1]
-    csv_tmp_name = final_result.predicted_csv.name.split('/')[-1]
-    output += '<p>Result Ply: <a download=' + ply_tmp_name + ' href=' + final_result.result_ply.name + '>Download</a></p>'
-    output += '<p>Predictions (CSV): <a download=' + csv_tmp_name + ' href=' + final_result.predicted_csv.name + '>Download</a></p>'
-    results_csv.close()
-    ply.close()
+    try:
+        result_csv_path = result_folder + '/gangerrefinedprojectpredict_' + size + '.csv'
+        ply = open(result_folder + '/result_hcsmooth12.ply_deform.ply', errors='ignore')
+        final_result = DataOutput(input_data=request.session['model_id'], model_size=size, result_ply=File(ply))
+        print('predict csv is ready\n')
+        results_csv = open(result_csv_path)
+        final_result.predicted_csv = File(results_csv)
+        read_csv = csv.reader(results_csv)
+        output = '<h1>Body Composition Predictions:</h1>'
+        for row in read_csv:
+            print(row[0])
+            if row[0] == "DXA_WEIGHT": final_result.DXA_WEIGHT = row[1]
+            elif row[0] == "DXA_HEIGHT": final_result.DXA_HEIGHT = row[1]
+            elif row[0] == "DXA_WBTOT_FAT": final_result.DXA_WBTOT_FAT = row[1]
+            elif row[0] == "DXA_WBTOT_LEAN": final_result.DXA_WBTOT_LEAN = row[1]
+            elif row[0] == "DXA_VFAT_MASS": final_result.DXA_VFAT_MASS = row[1]
+            elif row[0] == "DXA_ARM_LEAN": final_result.DXA_ARM_LEAN = row[1]
+            elif row[0] == "DXA_LEG_LEAN": final_result.DXA_LEG_LEAN = row[1]
+            elif row[0] == "DXA_WBTOT_PFAT": final_result.DXA_WBTOT_PFAT = row[1]
+            elif row[0] == "DXA_TRUNK_FAT": final_result.DXA_TRUNK_FAT = row[1]
+            elif row[0] == "DXA_TRUNK_LEAN": final_result.DXA_TRUNK_LEAN = row[1]
+            elif row[0] == "DXA_ARM_FAT": final_result.DXA_ARM_FAT = row[1]
+            elif row[0] == "DXA_LEG_FAT": final_result.DXA_LEG_FAT = row[1]
+            else: continue
+            output += '<p><b>' + row[0].replace('_', ' ') + ':</b>'
+            output += row[1] + '</p>'
+        final_result.predicted_csv = File(results_csv)
+        final_result.save()
+        ply_tmp_name = final_result.result_ply.name.split('/')[-1]
+        csv_tmp_name = final_result.predicted_csv.name.split('/')[-1]
+        output += '<p>Result Ply: <a download=' + ply_tmp_name + ' href=' + final_result.result_ply.name + '>Download</a></p>'
+        output += '<p>Predictions (CSV): <a download=' + csv_tmp_name + ' href=' + final_result.predicted_csv.name + '>Download</a></p>'
+        results_csv.close()
+        ply.close()
+    except:
+        output = "<h3>Oh no! We hit an error trying to get your results.</h3>"
     # end the session
     end_session(request)
     # placeholder output
