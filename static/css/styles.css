@@ -1,28 +1,44 @@
 .container {
     width: 33vh;
     outline: 1px solid #c4c4c4;
+    -webkit-box-shadow: 2px 2px 5px 0 #c4c4c4;
+    box-shadow: 2px 2px 5px 0 #c4c4c4;
     margin-left: auto;
     margin-right: auto;
     padding: 20px;
     border-radius: 10px;
     min-width: 350px;
     background: white;
+    align-items: center;
 }
 
-.container form {
-    text-align: center;
+#shapeup-adults {
+    margin-bottom: 0;
+}
+
+#upload_form {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1vh;
+    height: 60vh;
+    min-height: 350px;
 }
 
-.container form input,
+.container form label {
+    flex: 25% 2 1;
+    text-align: right;
+}
+
+.container form input, 
 .container form select {
-    margin-bottom: 40px;
+    flex: 60% 1 2;
+    height: 30px;
 }
 
 .btn {
     width: 50%;
-    height: 50px;
+    min-height: 40px;
     text-transform: uppercase;
     border: none;
     border-radius: 10px;

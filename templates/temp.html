@@ -1,6 +1,11 @@
-{% extends "main_template.html" %}
-
-{% block content %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Shape Up! Adults | 3D Mesh Auto Templater</title>
+    <link rel="stylesheet" href="..\static\css\styles.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  </head>
+  <body>
 <script>
     $(function () {
         $('#upload_form').on('submit', function (e) {
@@ -15,13 +20,12 @@
         <p>This may take 10-15 minutes, please keep the window open.</p>
     </div>
 </div>
-<h2 id="shapeup-adults" style="text-align: center;">Shape Up! Adults</h2>
-<h1 id="form-title" style="text-align: center;">3D Mesh Auto Templater Form</h1>
+<h2 style="text-align: center;">Shape Up! Adults</h2>
+<h1 style="text-align: center;">3D Mesh Auto Templater Form</h1>
 <div class="container">
     <form id="upload_form" action="" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form }}
         <input class="btn" type="submit" value="Submit" />
     </form>
 </div>
-{% endblock %}
+  </body>
+</html>
