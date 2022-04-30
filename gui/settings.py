@@ -47,8 +47,8 @@ X_FRAME_OPTIONS = 'SAMEORIGIN'
 # allow cookies to be collected (for sessions and forms to work)
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SAMESITE = 'None'
-SESSION_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SAMESITE = 'lax'
+SESSION_COOKIE_SAMESITE = 'lax'
 
 # Application definition
 

@@ -12,7 +12,7 @@ class DataInput(models.Model):
     uploaded_file = models.FileField("3DO file (.PLY)", upload_to="uploaded_mesh")
 
 class DataOutput(models.Model):
-    input = models.IntegerField()
+    input_data = models.IntegerField(default=0)
     model_size = models.PositiveIntegerField()
     DXA_WEIGHT = models.FloatField()
     DXA_HEIGHT = models.FloatField()
@@ -26,5 +26,5 @@ class DataOutput(models.Model):
     DXA_TRUNK_LEAN = models.FloatField()
     DXA_ARM_FAT = models.FloatField()
     DXA_LEG_FAT = models.FloatField()
-    predicted_csv = models.FileField()
-    result_ply = models.FileField()
+    predicted_csv = models.FileField(upload_to="result")
+    result_ply = models.FileField(upload_to="result")
