@@ -26,5 +26,5 @@ class DataOutput(models.Model):
     DXA_TRUNK_LEAN = models.FloatField()
     DXA_ARM_FAT = models.FloatField()
     DXA_LEG_FAT = models.FloatField()
-    predicted_csv = models.FileField(upload_to="result")
-    result_ply = models.FileField(upload_to="result")
+    predicted_csv = models.FileField()
+    result_ply = models.FileField()

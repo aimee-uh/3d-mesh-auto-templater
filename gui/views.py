@@ -13,6 +13,7 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.template import loader
 from django.core.files import File
 from APPDIST.run_tool import step1, step2
+import mimetypes
 import time
 import csv
 import os
@@ -25,7 +26,7 @@ def load_data(height, weight, sex, filename, model_size):
     if sex == 1:
         sexlabel = 'f'
     # set result_folder name
-    result_folder = 'resultsdir/' + sexlabel + filename + '/d=' + model_size
+    result_folder = 'APPDIST/resultsdir/' + sexlabel + filename + '/d=' + model_size
 
     print("\n\n------\nrunning step 1")
     step1(filename, model_size, sex, weight, height)
@@ -47,7 +48,7 @@ def load_data(height, weight, sex, filename, model_size):
     print("\n\n------\nrunning step 2")
     step2(result_folder, filename, model_size, sex)
     print("redirect to results page")
-    return result_folder
+    return "/"+result_folder
 
 
 
@@ -66,6 +67,7 @@ def ply_is_ascii(file_path):
         except:
             return False
     return format == 'format ascii 1.0\n'
+
 
 # takes DataInput model to generate the form
 class UploadFileForm(ModelForm):
@@ -143,14 +145,18 @@ def results(request):
     # helper for running algorithm
     if not request.session['result_folder']:
         result_folder = load_data(height, weight, sex, filename, size)
+        print("\n")
+        print(os.getcwd())
+        print(os.getcwd() + result_folder)
+        print("\n")
         request.session['result_folder'] = result_folder
     else:
         print("result_folder already exists")
 
     print("\n\n------\nget results")
     # get the results
-    result_csv_path = 'APPDIST/' + result_folder + '/gangerrefinedprojectpredict_' + size + '.csv'
-    ply = open('APPDIST/' + result_folder + '/gangerrefinedprojectpredict_' + size + '.csv', encoding='cp1252')
+    result_csv_path = result_folder + '/gangerrefinedprojectpredict_' + size + '.csv'
+    ply = open(result_folder + '/result_hcsmooth12.ply_deform.ply', errors='ignore')
     final_result = DataOutput(input_data=request.session['model_id'], model_size=size, result_ply=File(ply))
     print('predict csv is ready\n')
     results_csv = open(result_csv_path)
@@ -176,8 +182,10 @@ def results(request):
         output += row[1] + '</p>'
     final_result.predicted_csv = File(results_csv)
     final_result.save()
-    output += '<a href=' + str(final_result.result_ply) + '></a>'
-    output += '<a href=' + str(final_result.predicted_csv) + '></a>'
+    ply_tmp_name = final_result.result_ply.name.split('/')[-1]
+    csv_tmp_name = final_result.predicted_csv.name.split('/')[-1]
+    output += '<p>Result Ply: <a download=' + ply_tmp_name + ' href=' + final_result.result_ply.name + '>Download</a></p>'
+    output += '<p>Predictions (CSV): <a download=' + csv_tmp_name + ' href=' + final_result.predicted_csv.name + '>Download</a></p>'
     results_csv.close()
     ply.close()
     # end the session

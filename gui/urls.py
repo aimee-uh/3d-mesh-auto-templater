@@ -11,3 +11,5 @@ urlpatterns = [
     path('success/', views.load_data, name='load_data'),
     path('results/', views.results, name='results'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+urlpatterns += static('results/', document_root=settings.MEDIA_ROOT)

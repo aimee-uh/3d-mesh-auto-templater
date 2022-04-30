@@ -25,20 +25,24 @@ SECRET_KEY = 'django-insecure-c672cl5lh*tvvh7muf9z9be#+sax9pei9ruf-^3zf3#sw$eiut
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = True
-DEBUG = False
+DEBUG = True
 
 
 ALLOWED_HOSTS = ['localhost','shepherdresearchlab.org','.ngrok.io']
 
 # CORS settings that allow additional trusted origins (for iFrame functionality)
-CORS_ALLOWED_ORIGINS = ['https://4b7d-128-171-232-10.ngrok.io','https://shapeup.shepherdresearchlab.org']
+CORS_ALLOWED_ORIGINS = [
+    'https://8fb8-128-171-232-10.ngrok.io',
+    'https://shapeup.shepherdresearchlab.org',
+    ]
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https://\w+\.shepherdresearch\.org$",
     r"^https://\w+\.ngrok\.io$",
 ]
 CSRF_TRUSTED_ORIGINS = [
     "https://shapeup.shepherdresearchlab.org",
-    "https://4b7d-128-171-232-10.ngrok.io",
+    "https://8fb8-128-171-232-10.ngrok.io",
+    "https://shapeup.shepherdresearchlab.org/3d-mesh-auto-templater"
 ]
 
 # Allow site to be embedded into trusted origins
@@ -47,8 +51,8 @@ X_FRAME_OPTIONS = 'SAMEORIGIN'
 # allow cookies to be collected (for sessions and forms to work)
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SAMESITE = 'lax'
-SESSION_COOKIE_SAMESITE = 'lax'
+CSRF_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SAMESITE = 'None'
 
 # Application definition
 
@@ -147,6 +151,7 @@ USE_TZ = True
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'tmp')
+MEDIA_URL = '/file/'
 # Extra places for collectstatic to find static files.
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
