@@ -26,7 +26,7 @@ def load_data(height, weight, sex, filename, model_size):
     if sex == 1:
         sexlabel = 'f'
     # set result_folder name
-    result_folder = 'APPDIST/resultsdir/' + sexlabel + filename + '/d=' + model_size
+    result_folder = 'resultsdir/' + sexlabel + filename + '/d=' + model_size
 
     print("\n\n------\nrunning step 1")
     try:
@@ -37,21 +37,15 @@ def load_data(height, weight, sex, filename, model_size):
     print('waiting for pcamatch to create result.ply')
     # check every 2.5 seconds whether result.ply has been written
     content = result_ply.read()
-    i = 0
     while not content:
         time.sleep(2.5)
-        i += 2.5
-        if i % 60 == 0:
-            print('Running for ... ' + str(i/60) + ' minutes')
         content = result_ply.read()
     print('result.ply is ready\n')
     # if this function is reloaded, check if the final result file exists before trying to rerun step 2
-    print("check if result_hcsmooth12.ply_deform.ply exists")
-    print("--result_hcsmooth12.ply_deform.ply does NOT exist")
     print("\n\n------\nrunning step 2")
     step2(result_folder, filename, model_size, sex)
     print("redirect to results page")
-    return "/"+result_folder
+    return result_folder
 
 
 
@@ -160,6 +154,7 @@ def results(request):
     # get the results
     try:
         result_csv_path = result_folder + '/gangerrefinedprojectpredict_' + size + '.csv'
+        print(result_folder + '/result_hcsmooth12.ply_deform.ply')
         ply = open(result_folder + '/result_hcsmooth12.ply_deform.ply', errors='ignore')
         final_result = DataOutput(input_data=request.session['model_id'], model_size=size, result_ply=File(ply))
         print('predict csv is ready\n')
