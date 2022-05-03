@@ -1,5 +1,6 @@
 import os
 import time
+import sys
 
 def step1(filename, model_size, sex, weight, height):
     try:
@@ -28,3 +29,15 @@ def step2(result_folder, filename, model_size, sex):
         return True
     except:
         return False
+
+if __name__ == "__main__":
+    height = sys.argv[1]
+    weight = sys.argv[2]
+    sex = sys.argv[3]
+    filename = sys.argv[4]
+    model_size = sys.argv[5]
+    result_folder = sys.argv[6]
+    print("\n\nstarting step 1\n")
+    step1(filename, model_size, sex, weight, height)
+    print("\n\nstarting step 2\n")
+    step2(result_folder, filename, model_size, sex)
