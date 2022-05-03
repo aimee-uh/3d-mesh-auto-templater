@@ -187,7 +187,8 @@ def results(request):
         output += '<p>Predictions (CSV): <a download=' + csv_tmp_name + ' href=' + final_result.predicted_csv.name + '>Download</a></p>'
         results_csv.close()
         ply.close()
-    except:
+    except Exception as e:
+        print(e)
         output = "<h3>Oh no! We hit an error trying to get your results.</h3>"
     # end the session
     end_session(request)
