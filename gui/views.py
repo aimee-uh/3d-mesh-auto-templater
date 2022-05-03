@@ -2,17 +2,20 @@
 # functions for defining what is loading onto the webpages
 
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import DataInput, DataOutput
 from django.forms import ModelForm
 from django.forms.utils import ErrorList
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.template import loader
 from django.core.files import File
-from APPDIST.run_tool import step1, step2
+
 from . import settings
+from .models import DataInput, DataOutput
+from APPDIST.run_tool import step1, step2
+
 import time
 import csv
 import os
+from subprocess import Popen
 
 
 ## HELPER FUNCTIONS ##
@@ -48,8 +51,10 @@ def load_data(height, weight, sex, filename, model_size):
 # end session is added for security and clears all information that had been submitted
 def end_session(request):
     # deletes the model from the database, remove if we want to keep a database
-    DataInput.get(id=request.session['model_id'].delete())
-    print("Record deleted")
+    try:
+        DataInput.object.get(id=request.session['model_id'].delete())
+        print("Record deleted")
+    except: print("Failed to delete record")
     # delete result folder
     data_result_dir = "d=" + request.session['model_size']
     main_result_dir = request.session['result_folder'].removesuffix(data_result_dir)
