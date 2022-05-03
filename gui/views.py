@@ -1,9 +1,6 @@
 # views.py
 # functions for defining what is loading onto the webpages
 
-
-
-
 from django.http import HttpResponse, HttpResponseRedirect
 from .models import DataInput, DataOutput
 from django.forms import ModelForm
@@ -12,8 +9,11 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.template import loader
 from django.core.files import File
 from APPDIST.run_tool import step1, step2
+from . import settings
 import time
 import csv
+import os
+
 
 ## HELPER FUNCTIONS ##
 
@@ -47,7 +47,15 @@ def load_data(height, weight, sex, filename, model_size):
 
 # end session is added for security and clears all information that had been submitted
 def end_session(request):
-    # here we can add anything else for ending the session, such as deleting files
+    # deletes the model from the database, remove if we want to keep a database
+    DataInput.get(id=request.session['model_id'].delete())
+    print("Record deleted")
+    # delete result folder
+    data_result_dir = "d=" + request.session['model_size']
+    main_result_dir = request.session['result_folder'].removesuffix(data_result_dir)
+    if os.path.exists(main_result_dir): os.remove(main_result_dir)
+    # delete all tmp files
+    if os.path.exists(settings.MEDIA_ROOT): os.remove(settings.MEDIA_ROOT)
     # flush() removes all session data from the database, info stays in model db
     request.session.flush()
 
@@ -101,6 +109,11 @@ def index(request):
                     request.session['sex'] = inputs.sex
                     request.session['filename'] = file.name.removesuffix('.ply') # removing .ply bc the results folder doesn't include it
                     request.session['result_folder'] = ''
+                    # get the model size
+                    size = '391'
+                    if inputs.sex == 1:
+                        size = '457'
+                    request.session['model_size'] = size
                     # redirect to the results page
                     return HttpResponseRedirect('results')
                 else:
@@ -127,10 +140,7 @@ def results(request):
     age = request.session['age']
     sex = request.session['sex']
     filename = request.session['filename']
-    # get the model size
-    size = '391'
-    if sex == 1:
-        size = '457'
+    size = request.session['model_size']
 
     # sometimes the page is reloading and starts running the algorithm from the start
     # result_folder will be set once load_data has run so it'll stop this from happening
@@ -167,8 +177,10 @@ def results(request):
             else: continue
             output += '<p><b>' + row[0].replace('_', ' ') + ':</b>'
             output += row[1] + '</p>'
-        # .save(0) saves the model to the database
-        final_result.save()
+        
+        # .save(0) saves the model to the database, commented out for now
+        # final_result.save()
+
         # the "name" is saved as the entire path for the results, tmp_name gets just the name of the file
         ply_tmp_name = final_result.result_ply.name.split('/')[-1]
         csv_tmp_name = final_result.predicted_csv.name.split('/')[-1]

@@ -1,3 +1,5 @@
+python manage.py makemigrations
+python manage.py migrate
 python manage.py makemigrations gui
 python manage.py migrate gui
 python manage.py collectstatic --noinput
