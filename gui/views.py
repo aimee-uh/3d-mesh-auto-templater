@@ -5,7 +5,6 @@
 
 
 from django.http import HttpResponse, HttpResponseRedirect
-from numpy import True_
 from .models import DataInput, DataOutput
 from django.forms import ModelForm
 from django.forms.utils import ErrorList
@@ -13,38 +12,35 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.template import loader
 from django.core.files import File
 from APPDIST.run_tool import step1, step2
-import mimetypes
 import time
 import csv
-import os
-import asyncio
 
 ## HELPER FUNCTIONS ##
+
+# uses run_tool to run the algorithm
 def load_data(height, weight, sex, filename, model_size):
-    print('\n\n-------\nstarting analysis')
+    # set label for result folder
     sexlabel = 'm'
     if sex == 1:
         sexlabel = 'f'
+    
     # set result_folder name
     result_folder = 'resultsdir/' + sexlabel + filename + '/d=' + model_size
 
-    print("\n\n------\nrunning step 1")
+    # if result.ply already exists, we don't need to run step 1 again
     try:
         result_ply = open(result_folder + '/result.ply')
     except:
+        # run step 1
         step1(filename, model_size, sex, weight, height)
         result_ply = open(result_folder + '/result.ply')
-    print('waiting for pcamatch to create result.ply')
     # check every 2.5 seconds whether result.ply has been written
     content = result_ply.read()
     while not content:
         time.sleep(2.5)
         content = result_ply.read()
-    print('result.ply is ready\n')
-    # if this function is reloaded, check if the final result file exists before trying to rerun step 2
-    print("\n\n------\nrunning step 2")
+    # run step 2 once we make sure result.ply is written
     step2(result_folder, filename, model_size, sex)
-    print("redirect to results page")
     return result_folder
 
 
@@ -88,26 +84,22 @@ def index(request):
     # when the form is submitted
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
-        print('check if form is valid')
         if form.is_valid():
             # get file and check if it is a .ply file before continuing
-            print('--form is valid')
-            print('check if file ends with .ply')
             file = request.FILES['uploaded_file']
             if file.name.endswith('.ply'):
-                print('--file ends with .ply')
-                # save items from form to the current session
+                # save items from form to the database
                 inputs = form.save()
                 file_path = inputs.uploaded_file.path
-                print('check if ply is ascii')
+                # check if the ply is in ascii format
                 if ply_is_ascii(file_path):
-                    print('--ply is ascii')
+                    # save any variables we need later to the session
                     request.session['model_id'] = inputs.id
                     request.session['height'] = inputs.height
                     request.session['weight'] = inputs.weight
                     request.session['age'] = inputs.age
                     request.session['sex'] = inputs.sex
-                    request.session['filename'] = file.name.removesuffix('.ply')
+                    request.session['filename'] = file.name.removesuffix('.ply') # removing .ply bc the results folder doesn't include it
                     request.session['result_folder'] = ''
                     # redirect to the results page
                     return HttpResponseRedirect('results')
@@ -135,35 +127,31 @@ def results(request):
     age = request.session['age']
     sex = request.session['sex']
     filename = request.session['filename']
+    # get the model size
     size = '391'
     if sex == 1:
         size = '457'
 
-    # helper for running algorithm
+    # sometimes the page is reloading and starts running the algorithm from the start
+    # result_folder will be set once load_data has run so it'll stop this from happening
     if not request.session['result_folder']:
         result_folder = load_data(height, weight, sex, filename, size)
-        print("\n")
-        print(os.getcwd())
-        print(os.getcwd() + result_folder)
-        print("\n")
         request.session['result_folder'] = result_folder
     else:
         print("result_folder already exists")
 
-    print("\n\n------\nget results")
     # get the results
     try:
+        # get the result files
         result_csv_path = result_folder + '/gangerrefinedprojectpredict_' + size + '.csv'
-        print(result_folder + '/result_hcsmooth12.ply_deform.ply')
         ply = open(result_folder + '/result_hcsmooth12.ply_deform.ply', errors='ignore')
-        final_result = DataOutput(input_data=request.session['model_id'], model_size=size, result_ply=File(ply))
-        print('predict csv is ready\n')
         results_csv = open(result_csv_path)
-        final_result.predicted_csv = File(results_csv)
+        # save it to a DataOutput model
+        final_result = DataOutput(input_data=request.session['model_id'], model_size=size, result_ply=File(ply), predicted_csv=File(results_csv))
         read_csv = csv.reader(results_csv)
         output = '<h1>Body Composition Predictions:</h1>'
+        # saves each row in the CSV to the model and creates a line of HTML
         for row in read_csv:
-            print(row[0])
             if row[0] == "DXA_WEIGHT": final_result.DXA_WEIGHT = row[1]
             elif row[0] == "DXA_HEIGHT": final_result.DXA_HEIGHT = row[1]
             elif row[0] == "DXA_WBTOT_FAT": final_result.DXA_WBTOT_FAT = row[1]
@@ -179,19 +167,22 @@ def results(request):
             else: continue
             output += '<p><b>' + row[0].replace('_', ' ') + ':</b>'
             output += row[1] + '</p>'
-        final_result.predicted_csv = File(results_csv)
+        # .save(0) saves the model to the database
         final_result.save()
+        # the "name" is saved as the entire path for the results, tmp_name gets just the name of the file
         ply_tmp_name = final_result.result_ply.name.split('/')[-1]
         csv_tmp_name = final_result.predicted_csv.name.split('/')[-1]
+        # append the download links
         output += '<p>Result Ply: <a download=' + ply_tmp_name + ' href=' + final_result.result_ply.name + '>Download</a></p>'
         output += '<p>Predictions (CSV): <a download=' + csv_tmp_name + ' href=' + final_result.predicted_csv.name + '>Download</a></p>'
         results_csv.close()
         ply.close()
     except Exception as e:
+        # if there are any issues, display a user-friendly error
+        # print the actual error
         print(e)
         output = "<h3>Oh no! We hit an error trying to get your results.</h3>"
     # end the session
     end_session(request)
-    # placeholder output
-    print("render page")
+    # render the page
     return HttpResponse(output)
