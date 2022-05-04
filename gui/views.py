@@ -36,12 +36,12 @@ def load_data(height, weight, sex, filename, model_size, result_folder):
 
 
 # end session is added for security and clears all information that had been submitted
-def end_session(request):
+def end_session(upload_file, size, result_folder):
     # delete result folder
     error = ""
     try:
-        data_result_dir = "d=" + request.session['model_size']
-        main_result_dir = request.session['result_folder'].removesuffix(data_result_dir)
+        data_result_dir = "d=" + size
+        main_result_dir = result_folder.removesuffix(data_result_dir)
         error = main_result_dir
         shutil.rmtree(main_result_dir)
         error = settings.MEDIA_ROOT+"/uploaded_mesh"
@@ -50,21 +50,18 @@ def end_session(request):
         error += "\n deleting files"
     
     # clear database
+    which_model = ""
     try:
-        upload_id = request.session['model_id']
-        uploaded_data = DataInput.objects.get(id=upload_id)
+        which_model = "input"
+        userid = int(upload_file.split("_")[-1])
+        uploaded_data = DataInput.objects.get(id=userid)
         uploaded_data.delete()
-        error = "clear output from database"
-        result_data = DataOutput.objects.get(input_data=upload_id)
+        which_model = "output"
+        result_data = DataOutput.objects.get(input_data=upload_file)
         result_data.delete()
     except:
-        error += "\n clearing models from database"
+        error += "\n clearing " + which_model + " model from database"
 
-    # flush() removes all session data from the database
-    try:
-        request.session.flush()
-    except:
-        error += "\n session.flush()"
     print("Errors while ending session: " + error)
 
 
@@ -131,12 +128,15 @@ def index(request):
                 # check if the ply is in ascii format
                 if ply_is_ascii(file_path):
                     # save any variables we need later to the session
-                    request.session['model_id'] = inputs.id
                     height = inputs.height
                     weight = inputs.weight
                     sex = inputs.sex
-                    filename = file.name.removesuffix('.ply') # removing .ply bc the results folder doesn't include it
-                    # set label for result folder
+                    # renaming file
+                    filename = inputs.uploaded_file.name.removeprefix('uploaded_mesh/').removesuffix('.ply') + "_" + str(inputs.id)
+                    renamed_file_path = file_path.removesuffix('.ply') + "_" + str(inputs.id) + ".ply"
+                    os.rename(file_path, renamed_file_path)
+                    with open(renamed_file_path) as new_file: inputs.uploaded_file = File(new_file)
+                    # set label for result folder and set model size
                     sexlabel = 'm'
                     size = '391'
                     if sex == 1:
@@ -144,14 +144,13 @@ def index(request):
                         size = '457'
                     # set result_folder name
                     result_folder = 'resultsdir/' + sexlabel + filename + '/d=' + size
-                    request.session['result_folder'] = result_folder
+                    print(result_folder)
                     load_data(height, weight, sex, filename, size, result_folder)
-                    # get the model size
-                    request.session['model_size'] = size
+                    # save result database
+                    outputs = DataOutput(input_data=filename, model_size=size, result_folder=result_folder)
+                    outputs.save()
                     # redirect to the results page
-                    url = reverse('result', kwargs={'userid': inputs.id})
-                    # delete db entry
-                    inputs.delete()
+                    url = reverse('result', kwargs={'upload_file': filename})
                     return HttpResponseRedirect(url)
                 else:
                     errors = form._errors.setdefault('uploaded_file', ErrorList())
@@ -168,18 +167,21 @@ def index(request):
 
 # results after form submit
 @xframe_options_exempt
-def result(request, userid):
+def result(request, upload_file):
     print("open results page and reset cache")
-    this_url = '/result/'+ str(userid)
+    this_url = '/result/'+ upload_file
     cache.delete(this_url)
 
     template = loader.get_template('loading.html')
 
-
-    result_folder = request.session['result_folder']
-    size = request.session['model_size']
     if not os.getcwd().endswith("APPDIST"):
         os.chdir("APPDIST")
+
+    # pull result from database
+    final_result = DataOutput.objects.get(input_data=upload_file)
+    size = final_result.model_size
+    result_folder = final_result.result_folder
+
 
     result_csv_path = result_folder + '/gangerrefinedprojectpredict_' + size + '.csv'
 
@@ -205,7 +207,8 @@ def result(request, userid):
                 ply = open(result_folder + '/result_hcsmooth12.ply_deform_ascii.ply', errors='ignore')
                 results_csv = open(result_csv_path)
                 # save it to a DataOutput model
-                final_result = DataOutput(input_data=request.session['model_id'], model_size=size, result_ply=File(ply), predicted_csv=File(results_csv))
+                final_result.result_ply = File(ply)
+                final_result.predicted_csv = File(results_csv)
                 read_csv = csv.reader(results_csv)
                 # saves each row in the CSV to the model and creates a line of HTML
                 predict_headers = ''
@@ -245,6 +248,12 @@ def result(request, userid):
                 output = "Oh no! We hit an error trying to get your results."
                 context = {'output':output}
             # end the session
-            end_session(request)
+            end_session(upload_file, size, result_folder)
     # render the page
     return HttpResponse(template.render(context, request))
+
+
+def query(request):
+    with_id = DataOutput.objects.get(id=2)
+    test = DataOutput.objects.get(input_data="01ADL0007_fit3d_2")
+    return HttpResponse("<p>"+test.result_folder+"</p><p>"+with_id.result_folder+"</p>")
