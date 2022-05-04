@@ -35,15 +35,22 @@ def load_data(height, weight, sex, filename, model_size, result_folder):
 # end session is added for security and clears all information that had been submitted
 def end_session(request):
     # delete result folder
-    data_result_dir = "d=" + request.session['model_size']
-    main_result_dir = request.session['result_folder'].removesuffix(data_result_dir)
-    if os.path.exists(main_result_dir): 
+    error = "something went wrong"
+    try:
+        data_result_dir = "d=" + request.session['model_size']
+        main_result_dir = request.session['result_folder'].removesuffix(data_result_dir)
+        error = main_result_dir
         shutil.rmtree(main_result_dir)
-    # delete all uploaded files
-    if os.path.exists(settings.MEDIA_ROOT+"/uploaded_mesh"): 
+        error = "something went wrong"
+        # delete all uploaded files
+        error = settings.MEDIA_ROOT+"/uploaded_mesh"
         shutil.rmtree(settings.MEDIA_ROOT+"/uploaded_mesh")
-    # flush() removes all session data from the database, info stays in model db
-    request.session.flush()
+        # flush() removes all session data from the database, info stays in model db
+        error = "session.flush()"
+        request.session.flush()
+    except:
+        print("Error when ending session: " + error)
+
 
 
 # checks if the uploaded file is in ascii format
