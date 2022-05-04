@@ -3,9 +3,11 @@
 {% block content %}
 <div class="container container-wide">
     <h1>Body Composition Predictions:</h1>
-    <div class="predict_headers">{{ predict_headers|linebreaks }}</div>
-    <div class="predict_values">{{ predict_values|linebreaks }}</div>
-    <button class="btn" download="{{ply_name}}" href="{{ply_link}}">Download result .ply</button>
-    <button class="btn" download="{{csv_name}}" href="{{csv_link}}">Download predictions</button>
+    <div class="predictions">{{ predict_headers|linebreaks }}</div>
+    <div class="predictions">{{ predict_values|linebreaks }}</div>
+    <br>
+    <a download="{{ply_name}}" href="{{ply_link}}"><button class="btn">Download result .ply</button></a>
+    <br>
+    <a download="{{csv_name}}" href="{{csv_link}}"><button class="btn">Download predictions</button></a>
 </div>
 {% endblock %}
