@@ -8,7 +8,7 @@ from . import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
-    path('result/<int:userid>', views.results, name='results'),
+    path('result/<userid>', views.result, name='result'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 urlpatterns += static('results/', document_root=settings.MEDIA_ROOT)

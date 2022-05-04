@@ -45,24 +45,32 @@ def end_session(request):
 
 # checks if the uploaded file is in ascii format
 def ply_is_ascii(file_path):
-    with open(file_path, 'r') as this_file:
-        try:
+    try:
+        with open(file_path, 'r') as this_file:
             format = this_file.readlines()[1]
-        except:
-            return False
-    return format == 'format ascii 1.0\n'
+            return format == 'format ascii 1.0\n'
+    except:
+        return False
 
 # get stdout
-def get_loading_output(stdout_path):
+def get_loading_output(result_folder):
     output = ''
+    stdout_path = result_folder + '/stdout.txt'
+    gangerstdout_path = result_folder + '/gangerstdout.txt'
     try:
-        with open(stdout_path) as f:
-            stdout_info = f.readlines()
+        with open(gangerstdout_path) as f:
+            gangerstdout_path = f.readlines()
             for line in stdout_info:
                 output += line + "\n"
-    except Exception as e: 
-        print(e)
-        output += "Checking files..."
+    except:
+        try:
+            with open(stdout_path) as f:
+                stdout_info = f.readlines()
+                for line in stdout_info:
+                    output += line + "\n"
+        except Exception as e: 
+            print(e)
+            output += "Checking files..."
     return output
 
 # takes DataInput model to generate the form
@@ -114,10 +122,10 @@ def index(request):
                     load_data(height, weight, sex, filename, size, result_folder)
                     # get the model size
                     request.session['model_size'] = size
+                    # redirect to the results page
+                    url = reverse('result', kwargs={'userid': inputs.id})
                     # delete db entry
                     inputs.delete()
-                    # redirect to the results page
-                    url = reverse('results', kwargs={'userid': inputs.id})
                     return HttpResponseRedirect(url)
                 else:
                     errors = form._errors.setdefault('uploaded_file', ErrorList())
@@ -134,7 +142,7 @@ def index(request):
 
 # results after form submit
 @xframe_options_exempt
-def results(request, userid):
+def result(request, userid):
     print("open results page and reset cache")
     this_url = '/result/'+ str(userid)
     cache.delete(this_url)
@@ -144,18 +152,18 @@ def results(request, userid):
         result_folder = "APPDIST/" + result_folder
 
     result_csv_path = result_folder + '/gangerrefinedprojectpredict_' + size + '.csv'
-    stdout_path = result_folder + '/stdout.txt'
+    template = loader.get_template('loading.html')
 
     exists = os.path.exists(result_csv_path)
     if not exists:
         print("result csv does not exist")
-        output = get_loading_output(stdout_path)
+        output = get_loading_output(result_folder)
         context = {'output':output}
     else:
         results_csv = open(result_csv_path)
         if len(results_csv.readlines()) < 13:
             print("result csv is incomplete")
-            output = get_loading_output(stdout_path)
+            output = get_loading_output(result_folder)
             context = {'output':output}
         else:
             # get the results
@@ -191,6 +199,7 @@ def results(request, userid):
                 ply_tmp_name = final_result.result_ply.name.split('/')[-1]
                 csv_tmp_name = final_result.predicted_csv.name.split('/')[-1]
                 # append the download links
+                template = loader.get_template('final_results.html')
                 context = {'output':output, 'ply_name':ply_tmp_name, 'ply_link':final_result.predicted_csv.name, 'csv_name':csv_tmp_name, 'csv_link':final_result.result_ply.name}
                 results_csv.close()
                 ply.close()
@@ -204,5 +213,4 @@ def results(request, userid):
             # end the session
             end_session(request)
     # render the page
-    template = loader.get_template('loading.html')
     return HttpResponse(template.render(context, request))
