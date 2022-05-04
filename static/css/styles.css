@@ -12,16 +12,7 @@
 }
 
 .container-wide {
-    width: 80vh;
-    outline: 1px solid #c4c4c4;
-    -webkit-box-shadow: 2px 2px 5px 0 #c4c4c4;
-    box-shadow: 2px 2px 5px 0 #c4c4c4;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 20px;
-    border-radius: 10px;
-    min-width: 600px;
-    background: white;
+    width: 80vh !important;
 }
 
 .stdout-output {

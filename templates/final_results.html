@@ -1,7 +1,7 @@
 {% extends "main_template.html" %}
 
 {% block content %}
-<div class="container-wide">
+<div class="container container-wide">
     <h1>Body Composition Predictions:</h1>
     {{ output|linebreaks }}
     <button download="{{ply_name}}" href="{{ply_link}}">Download result .ply</button>
