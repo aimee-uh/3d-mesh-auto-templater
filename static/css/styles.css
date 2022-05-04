@@ -1,5 +1,5 @@
 .container {
-    width: 33vh;
+    width: 50vw;
     outline: 1px solid #c4c4c4;
     -webkit-box-shadow: 2px 2px 5px 0 #c4c4c4;
     box-shadow: 2px 2px 5px 0 #c4c4c4;
@@ -12,7 +12,7 @@
 }
 
 .container-wide {
-    width: 80vh !important;
+    width: 80vw !important;
 }
 
 .stdout-output {
