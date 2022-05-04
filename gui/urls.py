@@ -9,6 +9,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
     path('result/<userid>', views.result, name='result'),
+    path('query/', views.query, name='query'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 urlpatterns += static('result/', document_root=settings.MEDIA_ROOT)

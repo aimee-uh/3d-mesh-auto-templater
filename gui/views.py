@@ -38,21 +38,34 @@ def load_data(height, weight, sex, filename, model_size, result_folder):
 # end session is added for security and clears all information that had been submitted
 def end_session(request):
     # delete result folder
-    error = "something went wrong"
+    error = ""
     try:
         data_result_dir = "d=" + request.session['model_size']
         main_result_dir = request.session['result_folder'].removesuffix(data_result_dir)
         error = main_result_dir
         shutil.rmtree(main_result_dir)
-        error = "something went wrong"
-        # delete all uploaded files
         error = settings.MEDIA_ROOT+"/uploaded_mesh"
         shutil.rmtree(settings.MEDIA_ROOT+"/uploaded_mesh")
-        # flush() removes all session data from the database, info stays in model db
-        error = "session.flush()"
+    except:
+        error += "\n deleting files"
+    
+    # clear database
+    try:
+        upload_id = request.session['model_id']
+        uploaded_data = DataInput.objects.get(id=upload_id)
+        uploaded_data.delete()
+        error = "clear output from database"
+        result_data = DataOutput.objects.get(input_data=upload_id)
+        result_data.delete()
+    except:
+        error += "\n clearing models from database"
+
+    # flush() removes all session data from the database
+    try:
         request.session.flush()
     except:
-        print("Error when ending session: " + error)
+        error += "\n session.flush()"
+    print("Errors while ending session: " + error)
 
 
 
@@ -159,13 +172,16 @@ def result(request, userid):
     print("open results page and reset cache")
     this_url = '/result/'+ str(userid)
     cache.delete(this_url)
+
+    template = loader.get_template('loading.html')
+
+
     result_folder = request.session['result_folder']
     size = request.session['model_size']
     if not os.getcwd().endswith("APPDIST"):
         os.chdir("APPDIST")
 
     result_csv_path = result_folder + '/gangerrefinedprojectpredict_' + size + '.csv'
-    template = loader.get_template('loading.html')
 
     output = ''
     context = {}
@@ -219,10 +235,9 @@ def result(request, userid):
                 csv_tmp_name = final_result.predicted_csv.name.split('/')[-1]
                 # append the download links
                 template = loader.get_template('final_results.html')
-                context = {'predict_headers':predict_headers,'predict_values':predict_values, 'ply_name':ply_tmp_name, 'ply_link':final_result.predicted_csv.name, 'csv_name':csv_tmp_name, 'csv_link':final_result.result_ply.name}
+                context = {'predict_headers':predict_headers,'predict_values':predict_values, 'ply_name':ply_tmp_name, 'ply_link':final_result.result_ply.name, 'csv_name':csv_tmp_name, 'csv_link':final_result.predicted_csv.name}
                 results_csv.close()
                 ply.close()
-                final_result.delete()
             except Exception as e:
                 # if there are any issues, display a user-friendly error
                 # print the actual error
