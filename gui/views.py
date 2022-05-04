@@ -16,6 +16,7 @@ from .models import DataInput, DataOutput
 import csv
 import os
 from subprocess import Popen
+import shutil
 
 
 ## HELPER FUNCTIONS ##
@@ -36,9 +37,11 @@ def end_session(request):
     # delete result folder
     data_result_dir = "d=" + request.session['model_size']
     main_result_dir = request.session['result_folder'].removesuffix(data_result_dir)
-    if os.path.exists(main_result_dir): os.remove(main_result_dir)
+    if os.path.exists(main_result_dir): 
+        shutil.rmtree(main_result_dir)
     # delete all uploaded files
-    if os.path.exists(settings.MEDIA_ROOT+"/uploaded_mesh"): os.remove(settings.MEDIA_ROOT+"/uploaded_mesh")
+    if os.path.exists(settings.MEDIA_ROOT+"/uploaded_mesh"): 
+        shutil.rmtree(settings.MEDIA_ROOT+"/uploaded_mesh")
     # flush() removes all session data from the database, info stays in model db
     request.session.flush()
 
@@ -208,7 +211,7 @@ def result(request, userid):
                 # if there are any issues, display a user-friendly error
                 # print the actual error
                 print(e)
-                output = "<h3>Oh no! We hit an error trying to get your results.</h3>"
+                output = "Oh no! We hit an error trying to get your results."
                 context = {'output':output}
             # end the session
             end_session(request)
