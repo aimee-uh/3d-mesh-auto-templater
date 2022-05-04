@@ -202,7 +202,7 @@ def result(request, userid):
             try:
                 # get the result files
                 print("get the results")
-                ply = open(result_folder + '/result_hcsmooth12.ply_deform.ply', errors='ignore')
+                ply = open(result_folder + '/result_hcsmooth12.ply_deform_ascii.ply', errors='ignore')
                 results_csv = open(result_csv_path)
                 # save it to a DataOutput model
                 final_result = DataOutput(input_data=request.session['model_id'], model_size=size, result_ply=File(ply), predicted_csv=File(results_csv))
