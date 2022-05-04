@@ -62,8 +62,8 @@ def get_loading_output(result_folder):
     gangerstdout_path = result_folder + '/gangerstdout.txt'
     try:
         with open(gangerstdout_path) as f:
-            gangerstdout_path = f.readlines()
-            for line in stdout_info:
+            gangerstdout_info = f.readlines()
+            for line in gangerstdout_info:
                 output += line + "\n"
     except:
         try:
