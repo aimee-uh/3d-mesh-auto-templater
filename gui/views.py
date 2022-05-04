@@ -33,17 +33,12 @@ def load_data(height, weight, sex, filename, model_size, result_folder):
 
 # end session is added for security and clears all information that had been submitted
 def end_session(request):
-    # deletes the model from the database, remove if we want to keep a database
-    try:
-        DataInput.object.get(id=request.session['model_id'].delete())
-        print("Record deleted")
-    except: print("Failed to delete record")
     # delete result folder
     data_result_dir = "d=" + request.session['model_size']
     main_result_dir = request.session['result_folder'].removesuffix(data_result_dir)
     if os.path.exists(main_result_dir): os.remove(main_result_dir)
-    # delete all tmp files
-    # if os.path.exists(settings.MEDIA_ROOT): os.remove(settings.MEDIA_ROOT)
+    # delete all uploaded files
+    if os.path.exists(settings.MEDIA_ROOT+"/uploaded_mesh"): os.remove(settings.MEDIA_ROOT+"/uploaded_mesh")
     # flush() removes all session data from the database, info stays in model db
     request.session.flush()
 
@@ -59,20 +54,15 @@ def ply_is_ascii(file_path):
 
 # get stdout
 def get_loading_output(stdout_path):
-    output = '''<h3>Analyzing your data...</h3>
-    <p>Please keep this window open and refresh in a minute.</p><br>
-    <p> Current progress: </p></br>
-    '''
+    output = ''
     try:
-        print("open stdout")
         with open(stdout_path) as f:
             stdout_info = f.readlines()
             for line in stdout_info:
-                output += "<p>" + line + "</p>"
+                output += line + "\n"
     except Exception as e: 
         print(e)
-        print("\ncouldn't open stdout")
-        output += "<p>Checking files...</p>"
+        output += "Checking files..."
     return output
 
 # takes DataInput model to generate the form
@@ -124,6 +114,8 @@ def index(request):
                     load_data(height, weight, sex, filename, size, result_folder)
                     # get the model size
                     request.session['model_size'] = size
+                    # delete db entry
+                    inputs.delete()
                     # redirect to the results page
                     url = reverse('results', kwargs={'userid': inputs.id})
                     return HttpResponseRedirect(url)
@@ -144,37 +136,37 @@ def index(request):
 @xframe_options_exempt
 def results(request, userid):
     print("open results page and reset cache")
-    cache.delete('/result/'+ str(userid))
+    this_url = '/result/'+ str(userid)
+    cache.delete(this_url)
     result_folder = request.session['result_folder']
     size = request.session['model_size']
-    print(os.getcwd())
     if not os.getcwd().endswith("APPDIST"):
         result_folder = "APPDIST/" + result_folder
 
-    print(os.getcwd() + result_folder)
     result_csv_path = result_folder + '/gangerrefinedprojectpredict_' + size + '.csv'
     stdout_path = result_folder + '/stdout.txt'
-    print(stdout_path)
 
-    print("check if result_csv_path exists")
     exists = os.path.exists(result_csv_path)
     if not exists:
+        print("result csv does not exist")
         output = get_loading_output(stdout_path)
+        context = {'output':output}
     else:
         results_csv = open(result_csv_path)
         if len(results_csv.readlines()) < 13:
+            print("result csv is incomplete")
             output = get_loading_output(stdout_path)
+            context = {'output':output}
         else:
             # get the results
             try:
                 # get the result files
-                
+                print("get the results")
                 ply = open(result_folder + '/result_hcsmooth12.ply_deform.ply', errors='ignore')
                 results_csv = open(result_csv_path)
                 # save it to a DataOutput model
                 final_result = DataOutput(input_data=request.session['model_id'], model_size=size, result_ply=File(ply), predicted_csv=File(results_csv))
                 read_csv = csv.reader(results_csv)
-                output = '<h1>Body Composition Predictions:</h1>'
                 # saves each row in the CSV to the model and creates a line of HTML
                 for row in read_csv:
                     if row[0] == "DXA_WEIGHT": final_result.DXA_WEIGHT = row[1]
@@ -190,26 +182,27 @@ def results(request, userid):
                     elif row[0] == "DXA_ARM_FAT": final_result.DXA_ARM_FAT = row[1]
                     elif row[0] == "DXA_LEG_FAT": final_result.DXA_LEG_FAT = row[1]
                     else: continue
-                    output += '<p><b>' + row[0].replace('_', ' ') + ':</b>'
-                    output += row[1] + '</p>'
+                    output += row[0].replace('_', ' ') + row[1] + '\n'
                 
-                # .save(0) saves the model to the database, commented out for now
-                # final_result.save()
+                # .save(0) saves the model to the database, moves upload files
+                final_result.save()
 
                 # the "name" is saved as the entire path for the results, tmp_name gets just the name of the file
                 ply_tmp_name = final_result.result_ply.name.split('/')[-1]
                 csv_tmp_name = final_result.predicted_csv.name.split('/')[-1]
                 # append the download links
-                output += '<p>Result Ply: <a download=' + ply_tmp_name + ' href=' + final_result.result_ply.name + '>Download</a></p>'
-                output += '<p>Predictions (CSV): <a download=' + csv_tmp_name + ' href=' + final_result.predicted_csv.name + '>Download</a></p>'
+                context = {'output':output, 'ply_name':ply_tmp_name, 'ply_link':final_result.predicted_csv.name, 'csv_name':csv_tmp_name, 'csv_link':final_result.result_ply.name}
                 results_csv.close()
                 ply.close()
+                final_result.delete()
             except Exception as e:
                 # if there are any issues, display a user-friendly error
                 # print the actual error
                 print(e)
                 output = "<h3>Oh no! We hit an error trying to get your results.</h3>"
+                context = {'output':output}
             # end the session
             end_session(request)
     # render the page
-    return HttpResponse(output)
+    template = loader.get_template('loading.html')
+    return HttpResponse(template.render(context, request))

@@ -1,20 +1,6 @@
 {% extends "main_template.html" %}
 
 {% block content %}
-<script>
-    $(function () {
-        $('#upload_form').on('submit', function (e) {
-            $('#loading-overlay').removeAttr('style');
-            document.title = "Analyzing..."
-        });
-    })
-</script>
-<div id="loading-overlay" style="display:none">
-    <div class="container">
-        <h3>Analyzing your results...</h3>
-        <p>This may take 5-10 minutes, please keep the window open.</p>
-    </div>
-</div>
 <h2 id="shapeup-adults" style="text-align: center;">Shape Up! Adults</h2>
 <h1 id="form-title" style="text-align: center;">3D Mesh Auto Templater Form</h1>
 <div class="container">

@@ -9,7 +9,32 @@
     border-radius: 10px;
     min-width: 350px;
     background: white;
-    align-items: center;
+}
+
+.container-wide {
+    width: 80vh;
+    outline: 1px solid #c4c4c4;
+    -webkit-box-shadow: 2px 2px 5px 0 #c4c4c4;
+    box-shadow: 2px 2px 5px 0 #c4c4c4;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 20px;
+    border-radius: 10px;
+    min-width: 600px;
+    background: white;
+}
+
+.stdout-output {
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    max-height: 170px;
+    height: 170px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+#analysis-progress {
+    margin-top: 20px;
 }
 
 #shapeup-adults {
@@ -46,6 +71,11 @@
     -webkit-box-shadow: 2px 2px 5px 0 #c4c4c4;
     box-shadow: 2px 2px 5px 0 #c4c4c4;
     background-color: #aaccff;
+}
+
+.btn a {
+    text-decoration:none;
+    color: white;
 }
 
 .btn:hover {
