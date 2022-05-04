@@ -164,6 +164,9 @@ def result(request, userid):
     result_csv_path = result_folder + '/gangerrefinedprojectpredict_' + size + '.csv'
     template = loader.get_template('loading.html')
 
+    output = ''
+    context = {}
+
     exists = os.path.exists(result_csv_path)
     if not exists:
         print("result csv does not exist")
