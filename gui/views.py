@@ -23,8 +23,11 @@ import shutil
 
 # uses run_tool to run the algorithm
 def load_data(height, weight, sex, filename, model_size, result_folder):
+    if not os.getcwd().endswith("APPDIST"):
+        os.chdir("APPDIST")
+
     print("start process")
-    pargs = " ".join(["python APPDIST/run_tool.py", str(height), str(weight), str(sex), filename, model_size, result_folder])
+    pargs = " ".join(["python run_tool.py", str(height), str(weight), str(sex), filename, model_size, result_folder])
     print(pargs)
     pr = Popen(pargs, shell=True)
 
@@ -159,7 +162,7 @@ def result(request, userid):
     result_folder = request.session['result_folder']
     size = request.session['model_size']
     if not os.getcwd().endswith("APPDIST"):
-        result_folder = "APPDIST/" + result_folder
+        os.chdir("APPDIST")
 
     result_csv_path = result_folder + '/gangerrefinedprojectpredict_' + size + '.csv'
     template = loader.get_template('loading.html')
@@ -189,6 +192,8 @@ def result(request, userid):
                 final_result = DataOutput(input_data=request.session['model_id'], model_size=size, result_ply=File(ply), predicted_csv=File(results_csv))
                 read_csv = csv.reader(results_csv)
                 # saves each row in the CSV to the model and creates a line of HTML
+                predict_headers = ''
+                predict_values = ''
                 for row in read_csv:
                     if row[0] == "DXA_WEIGHT": final_result.DXA_WEIGHT = row[1]
                     elif row[0] == "DXA_HEIGHT": final_result.DXA_HEIGHT = row[1]
@@ -203,7 +208,8 @@ def result(request, userid):
                     elif row[0] == "DXA_ARM_FAT": final_result.DXA_ARM_FAT = row[1]
                     elif row[0] == "DXA_LEG_FAT": final_result.DXA_LEG_FAT = row[1]
                     else: continue
-                    output += row[0].replace('_', ' ') + row[1] + '\n'
+                    predict_headers += row[0].replace('_', ' ') + '\n'
+                    predict_values += row[1] + '\n'
                 
                 # .save(0) saves the model to the database, moves upload files
                 final_result.save()
@@ -213,7 +219,7 @@ def result(request, userid):
                 csv_tmp_name = final_result.predicted_csv.name.split('/')[-1]
                 # append the download links
                 template = loader.get_template('final_results.html')
-                context = {'output':output, 'ply_name':ply_tmp_name, 'ply_link':final_result.predicted_csv.name, 'csv_name':csv_tmp_name, 'csv_link':final_result.result_ply.name}
+                context = {'predict_headers':predict_headers,'predict_values':predict_values, 'ply_name':ply_tmp_name, 'ply_link':final_result.predicted_csv.name, 'csv_name':csv_tmp_name, 'csv_link':final_result.result_ply.name}
                 results_csv.close()
                 ply.close()
                 final_result.delete()

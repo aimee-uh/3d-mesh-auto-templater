@@ -11,4 +11,4 @@ urlpatterns = [
     path('result/<userid>', views.result, name='result'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
-urlpatterns += static('results/', document_root=settings.MEDIA_ROOT)
+urlpatterns += static('result/', document_root=settings.MEDIA_ROOT)
