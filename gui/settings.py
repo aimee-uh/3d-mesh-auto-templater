@@ -37,7 +37,7 @@ CORS_ALLOWED_ORIGINS = [
     ]
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https://\w+\.shepherdresearch\.org$",
-    r"^https://\w+\.ngrok\.io$",
+    r"^https://.\.ngrok\.io$",
 ]
 CSRF_TRUSTED_ORIGINS = [
     "https://shapeup.shepherdresearchlab.org",
