@@ -32,18 +32,20 @@ ALLOWED_HOSTS = ['localhost','shepherdresearchlab.org','.ngrok.io']
 
 # CORS settings that allow additional trusted origins (for iFrame functionality)
 CORS_ALLOWED_ORIGINS = [
-    'https://2eb8-205-175-118-221.ngrok.io',
+    'https://be9c-128-171-232-10.ngrok.io',
     'https://shapeup.shepherdresearchlab.org',
     ]
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https://\w+\.shepherdresearch\.org$",
-    r"^https://.\.ngrok\.io$",
+    r"^https://\w+\.ngrok\.io$",
 ]
 CSRF_TRUSTED_ORIGINS = [
     "https://shapeup.shepherdresearchlab.org",
-    "https://2eb8-205-175-118-221.ngrok.io",
+    "https://be9c-128-171-232-10.ngrok.io",
     "https://shapeup.shepherdresearchlab.org/3d-mesh-auto-templater"
 ]
+
+CSRF_COOKIE_DOMAIN = "shapeup.shepherdresearchlab.org"
 
 # Allow site to be embedded into trusted origins
 X_FRAME_OPTIONS = 'SAMEORIGIN'
