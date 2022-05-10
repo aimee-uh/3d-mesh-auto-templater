@@ -1,4 +1,8 @@
-.container {
+body {
+    padding-top: 1em;
+}
+
+.main-container {
     width: 50vw;
     outline: 1px solid #c4c4c4;
     -webkit-box-shadow: 2px 2px 5px 0 #c4c4c4;
@@ -9,10 +13,12 @@
     border-radius: 10px;
     min-width: 350px;
     background: white;
+    max-width: 1000px;
 }
 
 .container-wide {
     width: 80vw !important;
+    max-width: none !important;
 }
 
 .stdout-output {
@@ -42,18 +48,18 @@
     max-height: 450px;
 }
 
-.container form label {
+.main-container form label {
     flex: 25% 2 1;
     text-align: right;
 }
 
-.container form input, 
-.container form select {
+.main-container form input, 
+.main-container form select {
     flex: 60% 1 2;
     height: 30px;
 }
 
-.btn {
+.my-btn {
     width: 50%;
     min-height: 40px;
     text-transform: uppercase;
@@ -64,12 +70,12 @@
     background-color: #aaccff;
 }
 
-.btn a {
+.my-btn a {
     text-decoration:none;
     color: white;
 }
 
-.btn:hover {
+.my-btn:hover {
     -webkit-box-shadow: none;
     box-shadow: none;
     background-color: #6699ee;

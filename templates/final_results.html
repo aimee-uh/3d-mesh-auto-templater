@@ -1,13 +1,13 @@
 {% extends "main_template.html" %}
 
 {% block content %}
-<div class="container container-wide">
+<div class="main-container container-wide">
     <h1>Body Composition Predictions:</h1>
     <div class="predictions">{{ predict_headers|linebreaks }}</div>
     <div class="predictions">{{ predict_values|linebreaks }}</div>
     <br>
-    <a download="{{ply_name}}" href="{{ply_link}}"><button class="btn">Download result .ply</button></a>
+    <a download="{{ply_name}}" href="{{ply_link}}"><button class="my-btn">Download result .ply</button></a>
     <p></p>
-    <a download="{{csv_name}}" href="{{csv_link}}"><button class="btn">Download predictions</button></a>
+    <a download="{{csv_name}}" href="{{csv_link}}"><button class="my-btn">Download predictions</button></a>
 </div>
 {% endblock %}

@@ -1,13 +1,13 @@
 {% extends "main_template.html" %}
 
 {% block content %}
-<div class="container">
+<div class="main-container">
     <h3>Analyzing your results...</h3>
     <p>This may take 5-10 minutes, press the button below to check progress.</p>
-    <button class="btn" onClick="this.disabled=true; window.location.href=window.location.href;">Check for updates</button>
+    <button class="my-btn" onClick="this.disabled=true; window.location.href=window.location.href;">Check for updates</button>
 </div>
 <br>
-<div class="container container-wide">
+<div class="main-container container-wide">
     <h4 id="analysis-progress">Analysis progress:</h4>
     <div class="stdout-output">
         {{ output|linebreaks }}
