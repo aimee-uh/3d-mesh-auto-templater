@@ -42,10 +42,8 @@ def end_session(upload_file, size, result_folder):
     try:
         data_result_dir = "d=" + size
         main_result_dir = result_folder.removesuffix(data_result_dir)
-        error = main_result_dir
         shutil.rmtree(main_result_dir)
-        error = settings.MEDIA_ROOT+"/uploaded_mesh"
-        shutil.rmtree(settings.MEDIA_ROOT+"/uploaded_mesh")
+        shutil.rmtree(os.path.join(settings.MEDIA_ROOT,"uploaded_mesh"))
     except:
         error += "\n deleting files"
     
@@ -135,7 +133,8 @@ def index(request):
                     filename = inputs.uploaded_file.name.removeprefix('uploaded_mesh/').removesuffix('.ply') + "_" + str(inputs.id)
                     renamed_file_path = file_path.removesuffix('.ply') + "_" + str(inputs.id) + ".ply"
                     os.rename(file_path, renamed_file_path)
-                    with open(renamed_file_path) as new_file: inputs.uploaded_file = File(new_file)
+                    # this line is supposed to update the database, doesn't seem to work
+                    # with open(renamed_file_path) as new_file: inputs.uploaded_file = File(new_file)
                     # set label for result folder and set model size
                     sexlabel = 'm'
                     size = '391'
@@ -179,11 +178,12 @@ def result(request, upload_file):
 
     # pull result from database
     final_result = DataOutput.objects.get(input_data=upload_file)
+
     size = final_result.model_size
     result_folder = final_result.result_folder
 
 
-    result_csv_path = result_folder + '/gangerrefinedprojectpredict_' + size + '.csv'
+    result_csv_path = os.path.join(result_folder,'gangerrefinedprojectpredict_' + size + '.csv')
 
     output = ''
     context = {}
@@ -195,7 +195,7 @@ def result(request, upload_file):
         context = {'output':output}
     else:
         results_csv = open(result_csv_path)
-        if len(results_csv.readlines()) < 13:
+        if len(results_csv.readlines()) < 2:
             print("result csv is incomplete")
             output = get_loading_output(result_folder)
             context = {'output':output}
@@ -204,56 +204,68 @@ def result(request, upload_file):
             try:
                 # get the result files
                 print("get the results")
-                ply = open(result_folder + '/result_hcsmooth12.ply_deform_ascii.ply', errors='ignore')
+                ply_path = os.path.join(result_folder, 'result_hcsmooth12.ply_deform_ascii.ply')
+                ply = open(ply_path, errors='ignore')
                 results_csv = open(result_csv_path)
                 # save it to a DataOutput model
                 final_result.result_ply = File(ply)
                 final_result.predicted_csv = File(results_csv)
                 read_csv = csv.reader(results_csv)
+
+                lines = []
+
                 # saves each row in the CSV to the model and creates a line of HTML
                 predict_headers = ''
                 predict_values = ''
                 for row in read_csv:
-                    if row[0] == "DXA_WEIGHT": final_result.DXA_WEIGHT = row[1]
-                    elif row[0] == "DXA_HEIGHT": final_result.DXA_HEIGHT = row[1]
-                    elif row[0] == "DXA_WBTOT_FAT": final_result.DXA_WBTOT_FAT = row[1]
-                    elif row[0] == "DXA_WBTOT_LEAN": final_result.DXA_WBTOT_LEAN = row[1]
-                    elif row[0] == "DXA_VFAT_MASS": final_result.DXA_VFAT_MASS = row[1]
-                    elif row[0] == "DXA_ARM_LEAN": final_result.DXA_ARM_LEAN = row[1]
-                    elif row[0] == "DXA_LEG_LEAN": final_result.DXA_LEG_LEAN = row[1]
-                    elif row[0] == "DXA_WBTOT_PFAT": final_result.DXA_WBTOT_PFAT = row[1]
-                    elif row[0] == "DXA_TRUNK_FAT": final_result.DXA_TRUNK_FAT = row[1]
-                    elif row[0] == "DXA_TRUNK_LEAN": final_result.DXA_TRUNK_LEAN = row[1]
-                    elif row[0] == "DXA_ARM_FAT": final_result.DXA_ARM_FAT = row[1]
-                    elif row[0] == "DXA_LEG_FAT": final_result.DXA_LEG_FAT = row[1]
-                    else: continue
-                    predict_headers += row[0].replace('_', ' ') + '\n'
-                    predict_values += row[1] + '\n'
+                    lines.append(row)
+
+                predheaders = lines[0]
+                predvals = lines[1]
+
+                final_result.DXA_WBTOT_FAT = predvals[0]
+                final_result.DXA_WBTOT_LEAN = predvals[1]
+                final_result.DXA_VFAT_MASS = predvals[2]
+                final_result.DXA_ARM_LEAN = predvals[3]
+                final_result.DXA_LEG_LEAN = predvals[4]
+                final_result.DXA_WBTOT_PFAT = predvals[5]
+                final_result.DXA_TRUNK_FAT = predvals[6]
+                final_result.DXA_TRUNK_LEAN = predvals[7]
+                final_result.DXA_ARM_FAT = predvals[8]
+                final_result.DXA_LEG_FAT = predvals[9]
+
+                predict_headers += '\n'.join(predheaders)
+                predict_values += '\n'.join(predvals)
                 
                 # .save(0) saves the model to the database, moves upload files
                 final_result.save()
 
-                # the "name" is saved as the entire path for the results, tmp_name gets just the name of the file
-                ply_tmp_name = final_result.result_ply.name.split('/')[-1]
-                csv_tmp_name = final_result.predicted_csv.name.split('/')[-1]
+                # create new filename
+                new_ply_name = "result_" + upload_file + ".ply"
+                new_csv_name = "predictions_" + upload_file + ".csv"
+                # relative path (for the download href)
+                new_ply = os.path.join(result_folder, new_ply_name)
+                new_csv = os.path.join(result_folder, new_csv_name)
+                # absolute path (seemed easier for the renaming)
+                new_ply_abs = os.path.join(final_result.result_ply.path.removesuffix(final_result.result_ply.name),new_ply)
+                new_csv_abs = os.path.join(final_result.predicted_csv.path.removesuffix(final_result.predicted_csv.name),new_csv)
+                print(final_result.result_ply.path)
+                print(new_ply_abs)
+                os.rename(final_result.result_ply.path, new_ply_abs)
+                os.rename(final_result.predicted_csv.path, new_csv_abs)
+
                 # append the download links
                 template = loader.get_template('final_results.html')
-                context = {'predict_headers':predict_headers,'predict_values':predict_values, 'ply_name':ply_tmp_name, 'ply_link':final_result.result_ply.name, 'csv_name':csv_tmp_name, 'csv_link':final_result.predicted_csv.name}
+                context = {'predict_headers':predict_headers,'predict_values':predict_values, 'ply_name':new_ply_name, 'ply_link':new_ply, 'csv_name':new_csv_name, 'csv_link':new_csv}
                 results_csv.close()
                 ply.close()
             except Exception as e:
                 # if there are any issues, display a user-friendly error
                 # print the actual error
                 print(e)
-                output = "Oh no! We hit an error trying to get your results."
+                output = "Oh no! We hit an error trying to get your results. Please try again."
                 context = {'output':output}
             # end the session
             end_session(upload_file, size, result_folder)
     # render the page
     return HttpResponse(template.render(context, request))
-
-
-def query(request):
-    with_id = DataOutput.objects.get(id=2)
-    test = DataOutput.objects.get(input_data="01ADL0007_fit3d_2")
-    return HttpResponse("<p>"+test.result_folder+"</p><p>"+with_id.result_folder+"</p>")

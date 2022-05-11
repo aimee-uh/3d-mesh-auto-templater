@@ -24,37 +24,34 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-c672cl5lh*tvvh7muf9z9be#+sax9pei9ruf-^3zf3#sw$eiut'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
 DEBUG = True
+# DEBUG = False
 
 
 ALLOWED_HOSTS = ['localhost','shepherdresearchlab.org','.ngrok.io']
 
 # CORS settings that allow additional trusted origins (for iFrame functionality)
 CORS_ALLOWED_ORIGINS = [
-    'https://be9c-128-171-232-10.ngrok.io',
-    'https://shapeup.shepherdresearchlab.org',
-    ]
+    'https://e7c7-205-175-118-221.ngrok.io',
+    'https://shapeup.shepherdresearchlab.org'
+]
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https://\w+\.shepherdresearch\.org$",
     r"^https://\w+\.ngrok\.io$",
 ]
 CSRF_TRUSTED_ORIGINS = [
     "https://shapeup.shepherdresearchlab.org",
-    "https://be9c-128-171-232-10.ngrok.io",
+    "https://e7c7-205-175-118-221.ngrok.io",
     "https://shapeup.shepherdresearchlab.org/3d-mesh-auto-templater"
 ]
 
-CSRF_COOKIE_DOMAIN = "shapeup.shepherdresearchlab.org"
-
 # Allow site to be embedded into trusted origins
 X_FRAME_OPTIONS = 'SAMEORIGIN'
-
 # allow cookies to be collected (for sessions and forms to work)
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SAMESITE = 'lax'
-SESSION_COOKIE_SAMESITE = 'lax'
+CSRF_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SAMESITE = 'None'
 
 # Application definition
 
