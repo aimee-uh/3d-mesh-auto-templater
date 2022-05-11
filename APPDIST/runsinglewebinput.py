@@ -55,4 +55,5 @@ pargs = " ".join(["./pcamatch", "../" + input_ply, str(lda) ,str(gender), str(su
 print(pargs)
 processes.append(subprocess.Popen(pargs, stdout=stdoutfile, stderr=stderrfile, shell=True))
 os.chdir("../")
+
 processes[0].wait()

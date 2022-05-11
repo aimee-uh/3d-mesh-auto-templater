@@ -5,7 +5,7 @@ import sys
 import subprocess
 from os import path
 import projectPCA
-
+import cleanply
 overwrite = False
 
 #wrapper for laplacianply
@@ -81,7 +81,9 @@ print(pargs)
 pr = subprocess.Popen(pargs, shell=True)
 pr.wait()
 plyascii = gangerply[:-4] + "_ascii.ply"
-    
+
+cleanply.cleanPly(plyascii)
+
 #writes projected shape as ply and the predicted stats into text
 gangerprojectedpredicts = open(predictfiletxt, 'w')
 projected = projectPCA.projectPCAshape(pcanpy, plyascii ,averagemesh, gender)
@@ -92,10 +94,13 @@ linpredictions = np.dot(linregrmtx, np.append(projected[:numpcomps],  1.0))
     
 #THESE ARE NOT NECESSARILY IN THE SAME ORDER
 
-predictedlabels = ["DXA_WEIGHT", "DXA_HEIGHT", "DXA_WBTOT_FAT", "DXA_WBTOT_LEAN", "DXA_VFAT_MASS", "DXA_ARM_LEAN", "DXA_LEG_LEAN", "DXA_WBTOT_PFAT", "DXA_TRUNK_FAT", "DXA_TRUNK_LEAN", "DXA_ARM_FAT", "DXA_LEG_FAT"]
+predictedlabels = ["Total Fat Mass (kg)", "Total Lean Mass (kg)", "Visceral Fat Mass (kg)", "Arm Lean Mass (kg)", "Leg Lean Mass (kg)", "Percent Fat (%) Regression", "Trunk Fat Mass (kg)", "Trunk Lean Mass (kg)", "Arm Fat Mass (kg)", "Leg Fat Mass (kg)"]
 
-gangerprojectedpredicts.write('linear predictions ' + str(numpcomps) + ':\n')
-for i in range(len(predictedlabels)):
-    p = linpredictions[i]
-    l = predictedlabels[i]
-    gangerprojectedpredicts.write(l + ", " + str(p) + '\n')
+#gangerprojectedpredicts.write('linear predictions ' + str(numpcomps) + ':\n')
+line = ""
+for i in range(0, len(predictedlabels)):
+    p = linpredictions[i+2]
+    line += str(round(p, 2)) + ', '
+
+gangerprojectedpredicts.write(','.join(predictedlabels) + '\n')
+gangerprojectedpredicts.write(line + '\n')

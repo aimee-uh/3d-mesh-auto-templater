@@ -1,6 +1,7 @@
 import os
 import time
 import sys
+import cleanply
 
 def step1(filename, model_size, sex, weight, height):
     try:
@@ -8,7 +9,9 @@ def step1(filename, model_size, sex, weight, height):
         if not os.getcwd().endswith("APPDIST"):
             os.chdir("APPDIST")
         # run step 1
-        args_runsinglewebinput = "../tmp/uploaded_mesh/" + filename + ".ply " + model_size + " resultsdir " +  str(sex) + " " + str(weight) + " " + str(height)
+        tmpfilename = "../tmp/uploaded_mesh/" + filename + ".ply"
+        cleanply.cleanPly(tmpfilename)
+        args_runsinglewebinput = tmpfilename + " " + model_size + " resultsdir " +  str(sex) + " " + str(weight) + " " + str(height)
         print("python runsinglewebinput.py " + args_runsinglewebinput)
         os.system("python runsinglewebinput.py " + args_runsinglewebinput)
         return True
