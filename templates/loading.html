@@ -1,10 +1,22 @@
 {% extends "main_template.html" %}
 
 {% block content %}
+<script>
+    function spinnerAndRefresh() {
+        var button = document.getElementById("check-updates-button");
+        button.disabled = true;
+        document.getElementById('loading-onclick').style.display = "inline"
+        window.location.href = window.location.href;
+    };
+</script>
 <div class="main-container">
     <h3>Analyzing your results...</h3>
     <p>This may take 5-10 minutes, press the button below to check progress.</p>
-    <button class="my-btn" onClick="this.disabled=true; window.location.href=window.location.href;">Check for updates</button>
+    <button id="check-updates-button" class="my-btn" onmousedown="spinnerAndRefresh();">Check for updates</button>
+    <div id="loading-onclick" style="display:none;">
+        <div class='spinner-border spinner-border-sm m-1' role='status'> <span class='sr-only'>Refreshing...</span>
+        </div> Refreshing page...
+    </div>
 </div>
 <br>
 <div class="main-container container-wide">

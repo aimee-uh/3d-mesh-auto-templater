@@ -16,14 +16,14 @@
     <script>
         $(function () {
             $('#upload_form').on('submit', function (e) {
-                $('#upload_form').append('<br><div class="spinner-border" role="status"> <span class="sr-only">Loading...</span> </div><h5 id="load">Analyzing... don\'t close the window... This may take 10 minutes...</h5>')
+                $('#upload_form').append('<div class="spinner-border" role="status"> <span class="sr-only">Loading...</span> </div><h5 id="load">Checking your files... don\'t close the window...</h5>')
                 $('#form-submit').attr('disabled', 'disabled');
             });
         })
     </script>
 
 <h2 id="shapeup-adults" style="text-align: center;">Shape Up! Adults</h2>
-<h1 id="form-title" style="text-align: center;">3D Mesh Auto Templater Form</h1>
+<h1 id="form-title" style="text-align: center;">3D Optical Body Composition Analyzer</h1>
 <div class="main-container">
     <form id="upload_form" action="" method="post" enctype="multipart/form-data">
         {% csrf_token %}
